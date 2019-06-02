@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Светлана Ощепкова](https://up.htmlacademy.ru/javascript/17/user/398413).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Рябинин](https://up.htmlacademy.ru/javascript/17/user/63289).
 
 ---
 
