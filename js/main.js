@@ -16,8 +16,8 @@ var similarPhotoTemplate = document.querySelector('#picture')
     .querySelector('.picture');
 
 // открытие и закрытие поля редактирования фотографии
-var popupOpen = document.querySelector('.img-upload');
 var popup = document.querySelector('.img-upload__overlay');
+var uploadFileElement = document.querySelector('.img-upload__start');
 var popupClose = popup.querySelector('.img-upload__cancel');
 var ESC_KEYCODE = 27;
 
@@ -27,16 +27,10 @@ var imgSizeSmaller = popup.querySelector('.scale__control--smaller');
 var imgSizeBigger = popup.querySelector('.scale__control--bigger');
 var imgPreviewContainer = popup.querySelector('.img-upload__preview');
 var imgPreview = imgPreviewContainer.querySelector('img');
-var imgButtonChrome = popup.querySelector('.effects__preview--chrome');
-var imgButtonSepia = popup.querySelector('.effects__preview--sepia');
-var imgButtonMarvin = popup.querySelector('.effects__preview--marvin');
-var imgButtonPhobos = popup.querySelector('.effects__preview--phobos');
-var imgButtonHeat = popup.querySelector('.effects__preview--heat');
-var imgButtonNoEffect = popup.querySelector('.effects__preview--none');
+var fieldsetElement = popup.querySelector('.img-upload__effects');
 var pinEffect = popup.querySelector('.effect-level__pin');
+var pinEffectDepth = popup.querySelector('.effect-level__depth');
 var pinContainer = popup.querySelector('.effect-level');
-// координаты пина (свойство left)
-var pinPosition = window.getComputedStyle(pinEffect).left;
 
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -85,25 +79,27 @@ var renderPhoto = function (photo) {
 };
 
 // функция для открытия и закрытия всплывающего окна - редактирования фото
+
+
 var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
-    closePopup();
+    onButtonClose();
   }
 };
 
-var openPopup = function () {
+var onImageChange = function () {
   popup.classList.remove('hidden');
+  imgSize.value = '100%';
   document.addEventListener('keydown', onPopupEscPress);
 };
 
-var closePopup = function () {
+var onButtonClose = function () {
   popup.classList.add('hidden');
-  document.removeEventListener('click', openPopup);
+  document.removeEventListener('click', onImageChange);
   document.removeEventListener('kewdown', onPopupEscPress);
 };
 
 // изменение размеров изображения (меньше - больше)
-imgSize.value = '100%';
 var onButtonSizeSmallClick = function () {
   var size = parseInt(imgSize.value.slice(0, -1), 10);
   var step = 25;
@@ -129,13 +125,6 @@ var onButtonSizeBigClick = function () {
   }
 };
 
-// функция для вычисления уровня насыщенности
-var onPinClick = function (number) {
-  var pinWidth = Math.round(pinContainer.offsetWidth * pinPosition.slice(0, -1) / 100);
-  var filtrPinChange = pinWidth * number / pinContainer.offsetWidth;
-  return filtrPinChange;
-};
-
 // передаем параметры нашего массива в функцию, вставляем фотографии ...
 
 var renderPhotos = function (array) {
@@ -151,49 +140,64 @@ var photos = generatePhotosData(NUMBER_PHOTOS);
 renderPhotos(photos);
 
 // открываем и закрываем popup
-popupOpen.addEventListener('click', openPopup);
-popupClose.addEventListener('click', closePopup);
+uploadFileElement.addEventListener('change', function () {
+  onImageChange();
+});
+
+popupClose.addEventListener('click', function () {
+  onButtonClose();
+});
 
 // изменяем размер фото
 imgSizeSmaller.addEventListener('click', onButtonSizeSmallClick);
 imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
 
 // выбираем фильтры
-imgButtonChrome.addEventListener('click', function () {
-  imgPreview.style.filter = 'grayscale(1)';
-  pinEffect.addEventListener('mouseup', function () {
-    imgPreview.style.filter = 'grayscale(' + onPinClick(1) + ')';
+fieldsetElement.addEventListener('change', function () {
+  var checked = fieldsetElement.querySelector('input:checked');
+  pinEffect.style.left = '100%';
+  pinEffectDepth.style.width = '100%';
+  switch (checked.value) {
+    case 'chrome':
+      imgPreview.style.filter = 'grayscale(0.5)';
+      break;
+    case 'sepia':
+      imgPreview.style.filter = 'sepia(1)';
+      break;
+    case 'marvin':
+      imgPreview.style.filter = 'invert(100%)';
+      break;
+    case 'phobos':
+      imgPreview.style.filter = 'blur(3px)';
+      break;
+    case 'heat':
+      imgPreview.style.filter = 'brightness(3)';
+      break;
+    default:
+      imgPreview.style.filter = 'none';
+  }
+  pinEffect.addEventListener('mouseup', function (evt) {
+    evt.preventDefault();
+    var rectObject = pinContainer.getBoundingClientRect();
+    var pinWidth = evt.clientX - rectObject.left;
+    switch (checked.value) {
+      case 'chrome':
+        imgPreview.style.filter = 'grayscale(' + pinWidth * 1 / pinContainer.offsetWidth + ')';
+        break;
+      case 'sepia':
+        imgPreview.style.filter = 'sepia(' + pinWidth * 1 / pinContainer.offsetWidth + ')';
+        break;
+      case 'marvin':
+        imgPreview.style.filter = 'invert(' + pinWidth * 100 / pinContainer.offsetWidth + '%)';
+        break;
+      case 'phobos':
+        imgPreview.style.filter = 'blur(' + pinWidth * 3 / pinContainer.offsetWidth + 'px)';
+        break;
+      case 'heat':
+        imgPreview.style.filter = 'brightness(' + pinWidth * 3 / pinContainer.offsetWidth + ')';
+        break;
+      default:
+        imgPreview.style.filter = 'none';
+    }
   });
-});
-
-imgButtonSepia.addEventListener('click', function () {
-  imgPreview.style.filter = 'sepia(1)';
-  pinEffect.addEventListener('mouseup', function () {
-    imgPreview.style.filter = 'sepia(' + onPinClick(1) + ')';
-  });
-});
-
-imgButtonMarvin.addEventListener('click', function () {
-  imgPreview.style.filter = 'invert(100%)';
-  pinEffect.addEventListener('mouseup', function () {
-    imgPreview.style.filter = 'invert(' + onPinClick(100) + '%)';
-  });
-});
-
-imgButtonPhobos.addEventListener('click', function () {
-  imgPreview.style.filter = 'blur(3px)';
-  pinEffect.addEventListener('mouseup', function () {
-    imgPreview.style.filter = 'blur(' + onPinClick(3) + 'px)';
-  });
-});
-
-imgButtonHeat.addEventListener('click', function () {
-  imgPreview.style.filter = 'brightness(3)';
-  pinEffect.addEventListener('mouseup', function () {
-    imgPreview.style.filter = 'brightness(' + onPinClick(3) + ')';
-  });
-});
-
-imgButtonNoEffect.addEventListener('click', function () {
-  imgPreview.style.filter = 'none';
 });
