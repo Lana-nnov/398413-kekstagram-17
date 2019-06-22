@@ -28,10 +28,11 @@ var imgSizeBigger = popup.querySelector('.scale__control--bigger');
 var imgPreviewContainer = popup.querySelector('.img-upload__preview');
 var imgPreview = imgPreviewContainer.querySelector('img');
 var fieldsetElement = popup.querySelector('.img-upload__effects');
-var pinEffect = popup.querySelector('.effect-level__pin');
-var pinEffectDepth = popup.querySelector('.effect-level__depth');
-var pinContainer = popup.querySelector('.effect-level');
+var levelEffect = popup.querySelector('.effect-level__pin');
+var levelEffectDepth = popup.querySelector('.effect-level__depth');
 var STEP = 25;
+var MIN_SCALE_VALUE = 25;
+var MAX_SCALE_VALUE = 100;
 
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -99,55 +100,61 @@ var onButtonClose = function () {
   document.removeEventListener('kewdown', onPopupEscPress);
 };
 
+var getImageScale = function () {
+  return parseInt(imgSize.value.slice(0, -1), 10);
+};
+
 // изменение размеров изображения (меньше - больше)
 var onButtonSizeSmallClick = function () {
-  var size = parseInt(imgSize.value.slice(0, -1), 10);
-  if (size > STEP) { // если больше 25
+  var size = getImageScale();
+  if (size > MIN_SCALE_VALUE) {
     var sizeNew = size - STEP;
     setImageScale(sizeNew);
   }
 };
 
 var onButtonSizeBigClick = function () {
-  var size = parseInt(imgSize.value.slice(0, -1), 10);
+  var size = getImageScale();
   var sizeNew = size + STEP;
-  if (size <= STEP * 2) { // меньше или равно 50, тогда увеличиваем картинку пропорционально формуле из функции
+  if (size < MAX_SCALE_VALUE) {
     setImageScale(sizeNew);
-  } else if (size >= 100 - STEP && size < 100) { // равно 75 и меньше 100, тогда нет трансформации картинки, иначе выдает 'scale(0.01)'
-    imgSize.value = sizeNew + '%';
-    imgPreview.style.transform = 'scale(1.0)';
   }
 };
 
 // вычисление значения кнопки и коэффициента трансформации картинки
 var setImageScale = function (percentage) {
+  var value = percentage / 100;
   imgSize.value = percentage + '%';
-  var sizeTransform = 'scale(0.' + percentage + ')';
+  var sizeTransform = 'scale(' + value + ')';
   imgPreview.style.transform = sizeTransform;
 };
 
 // расчет насыщенности фильтра в зависимости от значения
 var applyFilter = function (percentage) {
   var checked = fieldsetElement.querySelector('input:checked');
+  var filter;
   switch (checked.value) {
     case 'chrome':
-      imgPreview.style.filter = 'grayscale(' + percentage + ')';
+      filter = 'grayscale(' + percentage / 100 + ')';
       break;
     case 'sepia':
-      imgPreview.style.filter = 'sepia(' + percentage + ')';
+      filter = 'sepia(' + percentage / 100 + ')';
       break;
     case 'marvin':
-      imgPreview.style.filter = 'invert(' + 100 * percentage + '%)';
+      filter = 'invert(' + percentage + '%)';
       break;
     case 'phobos':
-      imgPreview.style.filter = 'blur(' + 3 * percentage + 'px)';
+      filter = 'blur(' + 3 * percentage / 100 + 'px)';
       break;
     case 'heat':
-      imgPreview.style.filter = 'brightness(' + 3 * percentage + ')';
+      filter = 'brightness(' + 3 * percentage / 100 + ')';
       break;
     default:
       imgPreview.style.filter = 'none';
   }
+  imgPreview.style.filter = filter;
+  levelEffect.style.left = percentage + '%';
+  levelEffectDepth.style.width = percentage + '%';
 };
 
 // передаем параметры нашего массива в функцию, вставляем фотографии ...
@@ -174,15 +181,11 @@ imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
 
 // выбираем фильтры
 fieldsetElement.addEventListener('change', function () {
-  pinEffect.style.left = '100%';
-  pinEffectDepth.style.width = '100%';
-  applyFilter(1);
+  applyFilter(100);
 });
 
 // отслеживаем нажатие ползунка и меняем насыщенность
-pinEffect.addEventListener('mouseup', function (evt) {
+levelEffect.addEventListener('mouseup', function (evt) {
   evt.preventDefault();
-  var rectObject = pinContainer.getBoundingClientRect();
-  var pinWidth = evt.clientX - rectObject.left;
-  applyFilter(pinWidth / pinContainer.offsetWidth);
+  applyFilter(50);
 });
