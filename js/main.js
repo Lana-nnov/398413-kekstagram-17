@@ -15,6 +15,25 @@ var similarPhotoTemplate = document.querySelector('#picture')
     .content
     .querySelector('.picture');
 
+// открытие и закрытие поля редактирования фотографии
+var popup = document.querySelector('.img-upload__overlay');
+var uploadFileElement = document.querySelector('.img-upload__start');
+var popupClose = popup.querySelector('.img-upload__cancel');
+var ESC_KEYCODE = 27;
+
+// поиск полей для масштабирования фото, для наложения фильтров
+var imgSize = popup.querySelector('.scale__control--value');
+var imgSizeSmaller = popup.querySelector('.scale__control--smaller');
+var imgSizeBigger = popup.querySelector('.scale__control--bigger');
+var imgPreviewContainer = popup.querySelector('.img-upload__preview');
+var imgPreview = imgPreviewContainer.querySelector('img');
+var fieldsetElement = popup.querySelector('.img-upload__effects');
+var levelEffect = popup.querySelector('.effect-level__pin');
+var levelEffectDepth = popup.querySelector('.effect-level__depth');
+var STEP = 25;
+var MIN_SCALE_VALUE = 25;
+var MAX_SCALE_VALUE = 100;
+
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
   rand = Math.floor(rand);
@@ -26,7 +45,7 @@ var generateUsersData = function () {
   var users = [];
   for (var i = 0; i < AUTHORS.length; i++) {
     var userElement = {
-      avatar: 'img/' + (i + 1) + '.svg',
+      avatar: 'img/avatar-' + (i + 1) + '.svg',
       message: COMMENTS[Math.floor(Math.random() * COMMENTS.length)],
       name: AUTHORS[i]
     };
@@ -61,6 +80,83 @@ var renderPhoto = function (photo) {
   return photoElement;
 };
 
+// функция для открытия и закрытия всплывающего окна - редактирования фото
+
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onButtonClose();
+  }
+};
+
+var onImageChange = function () {
+  popup.classList.remove('hidden');
+  imgSize.value = '100%';
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var onButtonClose = function () {
+  popup.classList.add('hidden');
+  document.removeEventListener('kewdown', onPopupEscPress);
+};
+
+var getImageScale = function () {
+  return parseInt(imgSize.value.slice(0, -1), 10);
+};
+
+// изменение размеров изображения (меньше - больше)
+var onButtonSizeSmallClick = function () {
+  var size = getImageScale();
+  if (size > MIN_SCALE_VALUE) {
+    var sizeNew = size - STEP;
+    setImageScale(sizeNew);
+  }
+};
+
+var onButtonSizeBigClick = function () {
+  var size = getImageScale();
+  var sizeNew = size + STEP;
+  if (size < MAX_SCALE_VALUE) {
+    setImageScale(sizeNew);
+  }
+};
+
+// вычисление значения кнопки и коэффициента трансформации картинки
+var setImageScale = function (percentage) {
+  var value = percentage / 100;
+  imgSize.value = percentage + '%';
+  var sizeTransform = 'scale(' + value + ')';
+  imgPreview.style.transform = sizeTransform;
+};
+
+// расчет насыщенности фильтра в зависимости от значения
+var applyFilter = function (percentage) {
+  var checked = fieldsetElement.querySelector('input:checked');
+  var filter;
+  switch (checked.value) {
+    case 'chrome':
+      filter = 'grayscale(' + percentage / 100 + ')';
+      break;
+    case 'sepia':
+      filter = 'sepia(' + percentage / 100 + ')';
+      break;
+    case 'marvin':
+      filter = 'invert(' + percentage + '%)';
+      break;
+    case 'phobos':
+      filter = 'blur(' + 3 * percentage / 100 + 'px)';
+      break;
+    case 'heat':
+      filter = 'brightness(' + 3 * percentage / 100 + ')';
+      break;
+    default:
+      imgPreview.style.filter = 'none';
+  }
+  imgPreview.style.filter = filter;
+  levelEffect.style.left = percentage + '%';
+  levelEffectDepth.style.width = percentage + '%';
+};
+
 // передаем параметры нашего массива в функцию, вставляем фотографии ...
 
 var renderPhotos = function (array) {
@@ -75,3 +171,21 @@ var users = generateUsersData();
 var photos = generatePhotosData(NUMBER_PHOTOS);
 renderPhotos(photos);
 
+// открываем и закрываем popup
+uploadFileElement.addEventListener('change', onImageChange);
+popupClose.addEventListener('click', onButtonClose);
+
+// изменяем размер фото
+imgSizeSmaller.addEventListener('click', onButtonSizeSmallClick);
+imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
+
+// выбираем фильтры
+fieldsetElement.addEventListener('change', function () {
+  applyFilter(100);
+});
+
+// отслеживаем нажатие ползунка и меняем насыщенность
+levelEffect.addEventListener('mouseup', function (evt) {
+  evt.preventDefault();
+  applyFilter(50);
+});
