@@ -34,7 +34,6 @@ var userCommentTextarea = popup.querySelector('.text__description');
 var STEP = 25;
 var MIN_SCALE_VALUE = 25;
 var MAX_SCALE_VALUE = 100;
-var commentFocused = false;
 
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -86,7 +85,8 @@ var renderPhoto = function (photo) {
 
 
 var onPopupEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE && !commentFocused) {
+  var isFocused = (document.activeElement === userCommentTextarea);
+  if (evt.keyCode === ESC_KEYCODE && !isFocused) {
     onButtonClose();
   }
 };
@@ -191,14 +191,4 @@ levelEffect.addEventListener('mouseup', function (evt) {
   evt.preventDefault();
   applyFilter(50);
 });
-
-// проверяем фокус на поле комментария
-userCommentTextarea.addEventListener('focus', function () {
-  commentFocused = true;
-});
-
-userCommentTextarea.addEventListener('focusout', function () {
-  commentFocused = false;
-});
-
 
