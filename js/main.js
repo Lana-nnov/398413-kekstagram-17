@@ -30,6 +30,7 @@ var imgPreview = imgPreviewContainer.querySelector('img');
 var fieldsetElement = popup.querySelector('.img-upload__effects');
 var levelEffect = popup.querySelector('.effect-level__pin');
 var levelEffectDepth = popup.querySelector('.effect-level__depth');
+var userCommentTextarea = popup.querySelector('.text__description');
 var STEP = 25;
 var MIN_SCALE_VALUE = 25;
 var MAX_SCALE_VALUE = 100;
@@ -84,7 +85,8 @@ var renderPhoto = function (photo) {
 
 
 var onPopupEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
+  var isFocused = (document.activeElement === userCommentTextarea);
+  if (evt.keyCode === ESC_KEYCODE && !isFocused) {
     onButtonClose();
   }
 };
@@ -189,3 +191,4 @@ levelEffect.addEventListener('mouseup', function (evt) {
   evt.preventDefault();
   applyFilter(50);
 });
+
