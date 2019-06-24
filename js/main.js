@@ -31,11 +31,11 @@ var fieldsetElement = popup.querySelector('.img-upload__effects');
 var levelLine = popup.querySelector('.effect-level__line');
 var levelEffect = popup.querySelector('.effect-level__pin');
 var levelEffectDepth = popup.querySelector('.effect-level__depth');
+var levelFieldset = popup.querySelector('.img-upload__effect-level');
 var userCommentTextarea = popup.querySelector('.text__description');
 var STEP = 25;
 var MIN_SCALE_VALUE = 25;
 var MAX_SCALE_VALUE = 100;
-var LEVEL_LINE_WIDTH = 450;
 
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -97,6 +97,7 @@ var onImageChange = function () {
   popup.classList.remove('hidden');
   imgSize.value = '100%';
   document.addEventListener('keydown', onPopupEscPress);
+  levelFieldset.classList.add('hidden');
 };
 
 var onButtonClose = function () {
@@ -137,25 +138,35 @@ var setImageScale = function (percentage) {
 var applyFilter = function (percentage) {
   var checked = fieldsetElement.querySelector('input:checked');
   var filter;
+  var showPinLine = function () {
+    levelFieldset.classList.remove('hidden');
+  };
   switch (checked.value) {
     case 'chrome':
+      showPinLine();
       filter = 'grayscale(' + percentage / 100 + ')';
       break;
     case 'sepia':
+      showPinLine();
       filter = 'sepia(' + percentage / 100 + ')';
       break;
     case 'marvin':
+      showPinLine();
       filter = 'invert(' + percentage + '%)';
       break;
     case 'phobos':
+      showPinLine();
       filter = 'blur(' + 3 * percentage / 100 + 'px)';
       break;
     case 'heat':
+      showPinLine();
       filter = 'brightness(' + 3 * percentage / 100 + ')';
       break;
     default:
       imgPreview.style.filter = 'none';
+      levelFieldset.classList.add('hidden');
   }
+
   imgPreview.style.filter = filter;
   levelEffect.style.left = percentage + '%';
   levelEffectDepth.style.width = percentage + '%';
@@ -186,28 +197,19 @@ imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
 // двигаем ползунок
 levelEffect.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
-  var startCoord = {
-    x: evt.clientX + levelEffect.style.width / 2
-  };
+  var startCoord = evt.clientX;
 
   var onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
 
-    var shift = {
-      x: startCoord.x - moveEvt.clientX
-    };
+    var shift = startCoord - moveEvt.clientX;
 
-    startCoord = {
-      x: moveEvt.clientX
-    };
+    startCoord = moveEvt.clientX;
 
-    var nextCoordinate = levelEffectDepth.offsetWidth - shift.x;
-    var pinCoordinate = nextCoordinate * 100 / levelLine.offsetWidth;
-    if (nextCoordinate <= LEVEL_LINE_WIDTH) {
-      applyFilter(pinCoordinate);
-    } else {
-      applyFilter(100);
-    }
+    var nextCoordinate = levelEffectDepth.offsetWidth - shift;
+    var effectPercentage = nextCoordinate * 100 / levelLine.offsetWidth;
+    effectPercentage = Math.min(effectPercentage, 100);
+    applyFilter(effectPercentage);
   };
 
   var onMouseUp = function (upEvt) {
