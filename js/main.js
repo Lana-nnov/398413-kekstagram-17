@@ -28,12 +28,14 @@ var imgSizeBigger = popup.querySelector('.scale__control--bigger');
 var imgPreviewContainer = popup.querySelector('.img-upload__preview');
 var imgPreview = imgPreviewContainer.querySelector('img');
 var fieldsetElement = popup.querySelector('.img-upload__effects');
+var levelLine = popup.querySelector('.effect-level__line');
 var levelEffect = popup.querySelector('.effect-level__pin');
 var levelEffectDepth = popup.querySelector('.effect-level__depth');
 var userCommentTextarea = popup.querySelector('.text__description');
 var STEP = 25;
 var MIN_SCALE_VALUE = 25;
 var MAX_SCALE_VALUE = 100;
+var LEVEL_LINE_WIDTH = 450;
 
 function randomInteger(min, max) {
   var rand = min + Math.random() * (max + 1 - min);
@@ -181,14 +183,44 @@ popupClose.addEventListener('click', onButtonClose);
 imgSizeSmaller.addEventListener('click', onButtonSizeSmallClick);
 imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
 
+// двигаем ползунок
+levelEffect.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  var startCoord = {
+    x: evt.clientX + levelEffect.style.width / 2
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoord.x - moveEvt.clientX
+    };
+
+    startCoord = {
+      x: moveEvt.clientX
+    };
+
+    var nextCoordinate = levelEffectDepth.offsetWidth - shift.x;
+    var pinCoordinate = nextCoordinate * 100 / levelLine.offsetWidth;
+    if (nextCoordinate <= LEVEL_LINE_WIDTH) {
+      applyFilter(pinCoordinate);
+    } else {
+      applyFilter(100);
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
 // выбираем фильтры
 fieldsetElement.addEventListener('change', function () {
   applyFilter(100);
 });
-
-// отслеживаем нажатие ползунка и меняем насыщенность
-levelEffect.addEventListener('mouseup', function (evt) {
-  evt.preventDefault();
-  applyFilter(50);
-});
-
