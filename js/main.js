@@ -28,8 +28,10 @@ var imgSizeBigger = popup.querySelector('.scale__control--bigger');
 var imgPreviewContainer = popup.querySelector('.img-upload__preview');
 var imgPreview = imgPreviewContainer.querySelector('img');
 var fieldsetElement = popup.querySelector('.img-upload__effects');
+var levelLine = popup.querySelector('.effect-level__line');
 var levelEffect = popup.querySelector('.effect-level__pin');
 var levelEffectDepth = popup.querySelector('.effect-level__depth');
+var levelFieldset = popup.querySelector('.img-upload__effect-level');
 var userCommentTextarea = popup.querySelector('.text__description');
 var STEP = 25;
 var MIN_SCALE_VALUE = 25;
@@ -95,6 +97,7 @@ var onImageChange = function () {
   popup.classList.remove('hidden');
   imgSize.value = '100%';
   document.addEventListener('keydown', onPopupEscPress);
+  levelFieldset.classList.add('hidden');
 };
 
 var onButtonClose = function () {
@@ -135,25 +138,35 @@ var setImageScale = function (percentage) {
 var applyFilter = function (percentage) {
   var checked = fieldsetElement.querySelector('input:checked');
   var filter;
+  var showPinLine = function () {
+    levelFieldset.classList.remove('hidden');
+  };
   switch (checked.value) {
     case 'chrome':
+      showPinLine();
       filter = 'grayscale(' + percentage / 100 + ')';
       break;
     case 'sepia':
+      showPinLine();
       filter = 'sepia(' + percentage / 100 + ')';
       break;
     case 'marvin':
+      showPinLine();
       filter = 'invert(' + percentage + '%)';
       break;
     case 'phobos':
+      showPinLine();
       filter = 'blur(' + 3 * percentage / 100 + 'px)';
       break;
     case 'heat':
+      showPinLine();
       filter = 'brightness(' + 3 * percentage / 100 + ')';
       break;
     default:
       imgPreview.style.filter = 'none';
+      levelFieldset.classList.add('hidden');
   }
+
   imgPreview.style.filter = filter;
   levelEffect.style.left = percentage + '%';
   levelEffectDepth.style.width = percentage + '%';
@@ -181,14 +194,35 @@ popupClose.addEventListener('click', onButtonClose);
 imgSizeSmaller.addEventListener('click', onButtonSizeSmallClick);
 imgSizeBigger.addEventListener('click', onButtonSizeBigClick);
 
+// двигаем ползунок
+levelEffect.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  var startCoord = evt.clientX;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = startCoord - moveEvt.clientX;
+
+    startCoord = moveEvt.clientX;
+
+    var nextCoordinate = levelEffectDepth.offsetWidth - shift;
+    var effectPercentage = nextCoordinate * 100 / levelLine.offsetWidth;
+    effectPercentage = Math.min(effectPercentage, 100);
+    applyFilter(effectPercentage);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
 // выбираем фильтры
 fieldsetElement.addEventListener('change', function () {
   applyFilter(100);
 });
-
-// отслеживаем нажатие ползунка и меняем насыщенность
-levelEffect.addEventListener('mouseup', function (evt) {
-  evt.preventDefault();
-  applyFilter(50);
-});
-
