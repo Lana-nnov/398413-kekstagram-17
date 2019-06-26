@@ -2,17 +2,14 @@
 (function () {
   // открытие и закрытие поля редактирования фотографии
   var popup = document.querySelector('.img-upload__overlay');
-  var uploadFileElement = document.querySelector('.img-upload__start');
   var popupClose = popup.querySelector('.img-upload__cancel');
   var levelFieldset = popup.querySelector('.img-upload__effect-level');
   var userCommentTextarea = popup.querySelector('.text__description');
   var imgSize = popup.querySelector('.scale__control--value');
+  var fieldsetElement = popup.querySelector('.img-upload__effects');
+  var imgSizeSmaller = popup.querySelector('.scale__control--smaller');
+  var imgSizeBigger = popup.querySelector('.scale__control--bigger');
   var ESC_KEYCODE = 27;
-  window.form = {
-    popup: popup,
-    imgSize: imgSize,
-    levelFieldset: levelFieldset
-  };
 
   // функция для открытия и закрытия всплывающего окна - редактирования фото
 
@@ -23,7 +20,7 @@
     }
   };
 
-  var onImageChange = function () {
+  window.openPopup = function () {
     popup.classList.remove('hidden');
     imgSize.value = '100%';
     document.addEventListener('keydown', onPopupEscPress);
@@ -35,7 +32,20 @@
     document.removeEventListener('kewdown', onPopupEscPress);
   };
 
-  // открываем и закрываем popup
-  uploadFileElement.addEventListener('change', onImageChange);
+  // закрываем popup
   popupClose.addEventListener('click', onButtonClose);
+
+  // выбираем фильтры
+  fieldsetElement.addEventListener('change', function () {
+    window.applyFilter(100);
+  });
+
+  // изменяем размер фото
+  imgSizeSmaller.addEventListener('click', function () {
+    window.scale.onButtonSizeSmallClick();
+  });
+
+  imgSizeBigger.addEventListener('click', function () {
+    window.scale.onButtonSizeBigClick();
+  });
 })();

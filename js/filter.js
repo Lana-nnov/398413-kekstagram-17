@@ -1,19 +1,20 @@
 'use strict';
 (function () {
   // поиск полей для масштабирования фото, для наложения фильтров
-  var fieldsetElement = window.form.popup.querySelector('.img-upload__effects');
-  var imgPreviewContainer = window.form.popup.querySelector('.img-upload__preview');
+  var popup = document.querySelector('.img-upload__overlay');
+  var fieldsetElement = popup.querySelector('.img-upload__effects');
+  var imgPreviewContainer = popup.querySelector('.img-upload__preview');
   var imgPreview = imgPreviewContainer.querySelector('img');
-  var levelEffect = window.form.popup.querySelector('.effect-level__pin');
-  var levelEffectDepth = window.form.popup.querySelector('.effect-level__depth');
-  var levelLine = window.form.popup.querySelector('.effect-level__line');
-  window.imgPreview = imgPreview;
+  var levelFieldset = popup.querySelector('.img-upload__effect-level');
+  var levelEffect = popup.querySelector('.effect-level__pin');
+  var levelEffectDepth = popup.querySelector('.effect-level__depth');
+  var levelLine = popup.querySelector('.effect-level__line');
 
   // расчет насыщенности фильтра в зависимости от значения
   var applyFilter = function (percentage) {
     var checked = fieldsetElement.querySelector('input:checked');
     var filter;
-    window.form.levelFieldset.classList.remove('hidden');
+    levelFieldset.classList.remove('hidden');
     switch (checked.value) {
       case 'chrome':
         filter = 'grayscale(' + percentage / 100 + ')';
@@ -32,18 +33,13 @@
         break;
       default:
         imgPreview.style.filter = 'none';
-        window.form.levelFieldset.classList.add('hidden');
+        levelFieldset.classList.add('hidden');
     }
 
     imgPreview.style.filter = filter;
     levelEffect.style.left = percentage + '%';
     levelEffectDepth.style.width = percentage + '%';
   };
-
-  // выбираем фильтры
-  fieldsetElement.addEventListener('change', function () {
-    applyFilter(100);
-  });
 
   // двигаем ползунок
   levelEffect.addEventListener('mousedown', function (evt) {
@@ -73,4 +69,6 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  window.applyFilter = applyFilter;
 })();
