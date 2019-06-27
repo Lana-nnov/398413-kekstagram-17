@@ -7,8 +7,6 @@
   var userCommentTextarea = popup.querySelector('.text__description');
   var imgSize = popup.querySelector('.scale__control--value');
   var fieldsetElement = popup.querySelector('.img-upload__effects');
-  var imgSizeSmaller = popup.querySelector('.scale__control--smaller');
-  var imgSizeBigger = popup.querySelector('.scale__control--bigger');
   var ESC_KEYCODE = 27;
 
   // функция для открытия и закрытия всплывающего окна - редактирования фото
@@ -38,14 +36,5 @@
   // выбираем фильтры
   fieldsetElement.addEventListener('change', function () {
     window.applyFilter(100);
-  });
-
-  // изменяем размер фото
-  imgSizeSmaller.addEventListener('click', function () {
-    window.scale.onButtonSizeSmallClick();
-  });
-
-  imgSizeBigger.addEventListener('click', function () {
-    window.scale.onButtonSizeBigClick();
   });
 })();

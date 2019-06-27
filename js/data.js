@@ -7,14 +7,6 @@
     'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше',
     'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
   var AUTHORS = ['Петр', 'Василий', 'Дарина', 'Герман', 'Анна'];
-  var NUMBER_PHOTOS = 25;
-  var similarListElement = document.querySelector('.pictures');
-  var similarPhotoTemplate = document.querySelector('#picture')
-      .content
-      .querySelector('.picture');
-  var uploadFileElement = document.querySelector('.img-upload__start');
-
-  // находим контейнер с фото - тег <template> с классом pictures и внутри ccылку с id picture, в которой одно изображение
 
   function randomInteger(min, max) {
     var rand = min + Math.random() * (max + 1 - min);
@@ -53,31 +45,6 @@
     return photos;
   };
 
-  // функция для создания блока с фото, передаем конкретное фото + количество лайков
-  var renderPhoto = function (photo) {
-    var photoElement = similarPhotoTemplate.cloneNode(true);
-    photoElement.querySelector('.picture__img').src = photo.url;
-    photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
-    photoElement.querySelector('.picture__likes').textContent = photo.likes;
-    return photoElement;
-  };
-
-  // передаем параметры нашего массива в функцию, вставляем фотографии ...
-
-  var renderPhotos = function (array) {
-    var fragment = document.createDocumentFragment();
-    for (var i = 0; i < array.length; i++) {
-      fragment.appendChild(renderPhoto(array[i]));
-    }
-    similarListElement.appendChild(fragment);
-  };
-
   var users = generateUsersData();
-  var photos = generatePhotosData(NUMBER_PHOTOS);
-  renderPhotos(photos);
-
-  // открываем popup
-  uploadFileElement.addEventListener('change', function () {
-    window.openPopup();
-  });
+  window.generatePhotosData = generatePhotosData;
 })();
