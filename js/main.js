@@ -105,11 +105,12 @@ var onButtonClose = function () {
   document.removeEventListener('kewdown', onPopupEscPress);
 };
 
+// изменение размеров изображения (меньше - больше)
+
 var getImageScale = function () {
   return parseInt(imgSize.value.slice(0, -1), 10);
 };
 
-// изменение размеров изображения (меньше - больше)
 var onButtonSizeSmallClick = function () {
   var size = getImageScale();
   if (size > MIN_SCALE_VALUE) {
@@ -138,28 +139,21 @@ var setImageScale = function (percentage) {
 var applyFilter = function (percentage) {
   var checked = fieldsetElement.querySelector('input:checked');
   var filter;
-  var showPinLine = function () {
-    levelFieldset.classList.remove('hidden');
-  };
+  levelFieldset.classList.remove('hidden');
   switch (checked.value) {
     case 'chrome':
-      showPinLine();
       filter = 'grayscale(' + percentage / 100 + ')';
       break;
     case 'sepia':
-      showPinLine();
       filter = 'sepia(' + percentage / 100 + ')';
       break;
     case 'marvin':
-      showPinLine();
       filter = 'invert(' + percentage + '%)';
       break;
     case 'phobos':
-      showPinLine();
       filter = 'blur(' + 3 * percentage / 100 + 'px)';
       break;
     case 'heat':
-      showPinLine();
       filter = 'brightness(' + 3 * percentage / 100 + ')';
       break;
     default:
@@ -209,6 +203,7 @@ levelEffect.addEventListener('mousedown', function (evt) {
     var nextCoordinate = levelEffectDepth.offsetWidth - shift;
     var effectPercentage = nextCoordinate * 100 / levelLine.offsetWidth;
     effectPercentage = Math.min(effectPercentage, 100);
+    effectPercentage = Math.max(effectPercentage, 0);
     applyFilter(effectPercentage);
   };
 
