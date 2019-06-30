@@ -6,12 +6,6 @@
       .content
       .querySelector('.picture');
   var uploadFileElement = document.querySelector('.img-upload__start');
-  var mainPage = document.querySelector('main');
-
-  // находим блок с сообщением об ошибке
-  var errorElement = document.querySelector('#error')
-      .content
-      .querySelector('.error');
 
   // функция для создания блока с фото, передаем конкретное фото + количество лайков
   var renderPhoto = function (photo) {
@@ -37,29 +31,9 @@
   });
 
   // в случае успешного ответа сервера загружаем фотографии с данными
-  var onWindowLoadSuccess = function (array) {
+  var showLoadSuccess = function (array) {
     renderPhotos(array);
   };
 
-  // изменяем сообщение об ошибке для случая, если не пришли данные с сервера
-  var changeButtonError = function () {
-    var buttonErrorLast = document.querySelector('.error__buttons > button:last-child');
-    var buttonError = document.querySelector('.error__button');
-    var errorTitle = document.querySelector('.error__title');
-    errorTitle.textContent = 'Ошибка загрузки данных';
-    buttonErrorLast.classList.add('hidden');
-    buttonError.addEventListener('click', function () {
-      location.reload();
-    });
-  };
-
-  // в случае неуспешного ответа сервера показываем окно об ошибке
-  var onWindowLoadError = function () {
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(errorElement);
-    mainPage.appendChild(fragment);
-    changeButtonError();
-  };
-
-  window.load(onWindowLoadSuccess, onWindowLoadError);
+  window.load(showLoadSuccess, window.showErrorOfLoad);
 })();
