@@ -1,7 +1,6 @@
 'use strict';
 (function () {
   // обозначаем константы и переменные
-  var NUMBER_PHOTOS = 25;
   var similarListElement = document.querySelector('.pictures');
   var similarPhotoTemplate = document.querySelector('#picture')
       .content
@@ -18,7 +17,6 @@
   };
 
   // передаем параметры нашего массива в функцию, вставляем фотографии ...
-
   var renderPhotos = function (array) {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < array.length; i++) {
@@ -27,11 +25,15 @@
     similarListElement.appendChild(fragment);
   };
 
-  var photos = window.generatePhotosData(NUMBER_PHOTOS);
-  renderPhotos(photos);
-
   // открываем popup
   uploadFileElement.addEventListener('change', function () {
     window.openPopup();
   });
+
+  // в случае успешного ответа сервера загружаем фотографии с данными
+  var showLoadSuccess = function (array) {
+    renderPhotos(array);
+  };
+
+  window.load(showLoadSuccess, window.showErrorOfLoad);
 })();
