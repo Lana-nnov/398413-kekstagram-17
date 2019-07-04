@@ -33,7 +33,7 @@
 
   // функция для удаления всех элементов из родителя
   var clearPictures = function () {
-    similarListElement.querySelectorAll('.picture').forEach(function (element){
+    similarListElement.querySelectorAll('.picture').forEach(function (element) {
       element.remove();
     });
   };
