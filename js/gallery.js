@@ -50,11 +50,11 @@
   };
 
   // функция для смены класса на активном элементе и удаления предыдущей выборки фото
-  var activateFilter = function (evt) {
+  var activateFilter = function (buttonActive) {
     buttonsFilter.forEach(function (elem) {
       elem.classList.remove('img-filters__button--active');
     });
-    evt.classList.add('img-filters__button--active');
+    buttonActive.classList.add('img-filters__button--active');
   };
 
   // функция для сортировки и показа фотографий по обсуждаемости (в зависимости от количества комментариев)
@@ -81,16 +81,7 @@
     return picturesBlock;
   };
 
-  // открываем popup
-  uploadFileElement.addEventListener('change', function () {
-    window.openPopup();
-  });
-
-
-  window.load(showLoadSuccess, window.showErrorOfLoad);
-
-  // var onFilterButtonClickDebounce = window.debounce(onFilterButtonClick);
-  var onFilterButtonClickDebounce = window.debounce(function (evt) {
+  var onFilterButtonClick = function (evt) {
     clearPictures();
     activateFilter(evt.target);
     var id = evt.target.id;
@@ -101,20 +92,17 @@
     } else if (id === 'filter-discussed') {
       showDiscussedFotos(picturesBlock);
     }
+  };
+
+  // открываем popup
+  uploadFileElement.addEventListener('change', function () {
+    window.openPopup();
   });
 
-  //  var onFilterButtonClick = function (evt) {
-  //    clearPictures();
-  //    activateFilter(evt.target);
-  //    var id = evt.target.id;
-  //    if (id === 'filter-popular') {
-  //      renderPhotos(picturesBlock);
-  //    } else if (id === 'filter-new') {
-  //      showNewFotos(picturesBlock);
-  //    } else if (id === 'filter-discussed') {
-  //      showDiscussedFotos(picturesBlock);
-  //    }
-  //  };
+
+  window.load(showLoadSuccess, window.showErrorOfLoad);
+
+  var onFilterButtonClickDebounce = window.debounce(onFilterButtonClick);
 
   // меняем подборку фотографий при нажатии на фильтр "Популярные"
   discussedPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
