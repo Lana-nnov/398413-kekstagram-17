@@ -6,6 +6,12 @@
       .content
       .querySelector('.picture');
   var uploadFileElement = document.querySelector('.img-upload__start');
+  var imgFilters = document.querySelector('.img-filters');
+  var popularPhotoFilter = imgFilters.querySelector('#filter-popular');
+  var discussedPhotoFilter = imgFilters.querySelector('#filter-discussed');
+  var newPhotoFilter = imgFilters.querySelector('#filter-new');
+  var buttonsFilter = imgFilters.querySelectorAll('button');
+  var picturesBlock = [];
 
   // функция для создания блока с фото, передаем конкретное фото + количество лайков
   var renderPhoto = function (photo) {
@@ -25,15 +31,81 @@
     similarListElement.appendChild(fragment);
   };
 
+  // функция для удаления всех элементов из родителя
+  var clearPictures = function () {
+    similarListElement.querySelectorAll('.picture').forEach(function (element) {
+      element.remove();
+    });
+  };
+
+  // функция для сортировки массива в случайном порядке
+  var shuffleArray = function (array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array;
+  };
+
+  // функция для смены класса на активном элементе и удаления предыдущей выборки фото
+  var activateFilter = function (buttonActive) {
+    buttonsFilter.forEach(function (elem) {
+      elem.classList.remove('img-filters__button--active');
+    });
+    buttonActive.classList.add('img-filters__button--active');
+  };
+
+  // функция для сортировки и показа фотографий по обсуждаемости (в зависимости от количества комментариев)
+  var showDiscussedFotos = function (array) {
+    var arrayCopy = array.slice();
+    arrayCopy.sort(function (first, second) {
+      return second.comments.length - first.comments.length;
+    });
+    renderPhotos(arrayCopy);
+  };
+
+  // функция для показа новых фотографий (в случайном порядке)
+  var showNewFotos = function (array) {
+    var arrayCopy = array.slice();
+    shuffleArray(arrayCopy);
+    renderPhotos(arrayCopy);
+  };
+
+  // в случае успешного ответа сервера загружаем фотографии с данными
+  var showLoadSuccess = function (array) {
+    picturesBlock = array;
+    imgFilters.classList.remove('img-filters--inactive');
+    renderPhotos(picturesBlock);
+    return picturesBlock;
+  };
+
+  var onFilterButtonClick = function (evt) {
+    clearPictures();
+    activateFilter(evt.target);
+    var id = evt.target.id;
+    if (id === 'filter-popular') {
+      renderPhotos(picturesBlock);
+    } else if (id === 'filter-new') {
+      showNewFotos(picturesBlock);
+    } else if (id === 'filter-discussed') {
+      showDiscussedFotos(picturesBlock);
+    }
+  };
+
   // открываем popup
   uploadFileElement.addEventListener('change', function () {
     window.openPopup();
   });
 
-  // в случае успешного ответа сервера загружаем фотографии с данными
-  var showLoadSuccess = function (array) {
-    renderPhotos(array);
-  };
 
   window.load(showLoadSuccess, window.showErrorOfLoad);
+
+  var onFilterButtonClickDebounce = window.debounce(onFilterButtonClick);
+
+  // меняем подборку фотографий при нажатии на фильтр "Популярные"
+  discussedPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
+  popularPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
+  newPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
 })();
