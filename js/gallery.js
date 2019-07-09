@@ -12,8 +12,6 @@
   var newPhotoFilter = imgFilters.querySelector('#filter-new');
   var buttonsFilter = imgFilters.querySelectorAll('button');
   var picturesBlock = [];
-  var bigPicture = document.querySelector('.big-picture');
-  var bigPictureClose = bigPicture.querySelector('.big-picture__cancel');
 
   // функция для создания блока с фото, передаем конкретное фото + количество лайков
   var renderPhoto = function (photo) {
@@ -97,7 +95,6 @@
   };
 
   var showBigPhoto = function (evt) {
-    evt.preventDefault();
     if (evt.target.classList.contains('picture__img')) {
       var attribute = evt.target.getAttribute('src');
       for (var i = 0; i < picturesBlock.length; i++) {
@@ -124,9 +121,4 @@
 
   // открываем большое фото при клике на превью
   similarListElement.addEventListener('click', showBigPhoto);
-
-  // закрываем большое фото
-  bigPictureClose.addEventListener('click', function () {
-    bigPicture.classList.add('hidden');
-  });
 })();
