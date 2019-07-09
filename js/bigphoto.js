@@ -55,7 +55,7 @@
         commentLink.classList.add('hidden');
         commentItem.style.display = 'flex';
       } else {
-        commentLink.classList.remove('hidden')
+        commentLink.classList.remove('hidden');
       }
     });
   };
