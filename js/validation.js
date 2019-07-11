@@ -2,6 +2,7 @@
 (function () {
   var popup = document.querySelector('.img-upload__overlay');
   var hashtag = popup.querySelector('.text__hashtags');
+  var form = document.querySelector('.img-upload__form');
   var MAX_HASHTAGS = 5;
   var MIN_LENGTH_HASHTAG = 2;
   var MAX_LENGTH_HASHTAG = 20;
@@ -38,9 +39,11 @@
       } else {
         hashtag.setCustomValidity(' ');
         hashtag.style.border = 'none';
+        window.upload(new FormData(form), window.responseData, window.showErrorOfLoadForm);
       }
     }
   };
 
   hashtag.addEventListener('change', checkHashtags);
+
 })();
