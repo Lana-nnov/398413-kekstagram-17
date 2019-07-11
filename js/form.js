@@ -7,6 +7,7 @@
   var hashtag = popup.querySelector('.text__hashtags');
   var imgSize = popup.querySelector('.scale__control--value');
   var fieldsetElement = popup.querySelector('.img-upload__effects');
+  var form = document.querySelector('.img-upload__form');
   var ESC_KEYCODE = 27;
 
   // функция для открытия и закрытия всплывающего окна - редактирования фото
@@ -36,5 +37,11 @@
   // выбираем фильтры
   fieldsetElement.addEventListener('change', function () {
     window.applyFilter(100);
+  });
+
+  // отправляет данные на сервер
+  form.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.upload(new FormData(form), window.responseData, window.showErrorOfLoadForm);
   });
 })();
