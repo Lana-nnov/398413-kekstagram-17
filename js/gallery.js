@@ -12,6 +12,7 @@
   var newPhotoFilter = imgFilters.querySelector('#filter-new');
   var buttonsFilter = imgFilters.querySelectorAll('button');
   var picturesBlock = [];
+  var ENTER_KEYCODE = 13;
 
   // функция для создания блока с фото, передаем конкретное фото + количество лайков
   var renderPhoto = function (photo) {
@@ -94,13 +95,11 @@
     }
   };
 
-  var showBigPhoto = function (evt) {
-    if (evt.target.classList.contains('picture__img')) {
-      var attribute = evt.target.getAttribute('src');
-      for (var i = 0; i < picturesBlock.length; i++) {
-        if (picturesBlock[i].url === attribute) {
-          window.showBigPicture(picturesBlock[i]);
-        }
+  var showBigPhoto = function (attribute) {
+    for (var i = 0; i < picturesBlock.length; i++) {
+      if (picturesBlock[i].url === attribute) {
+        window.showBigPicture(picturesBlock[i]);
+        break;
       }
     }
   };
@@ -120,5 +119,20 @@
   newPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
 
   // открываем большое фото при клике на превью
-  similarListElement.addEventListener('click', showBigPhoto);
+  similarListElement.addEventListener('click', function (evt) {
+    if (evt.target.classList.contains('picture__img')) {
+      var photoAttribute = evt.target.getAttribute('src');
+      showBigPhoto(photoAttribute);
+    }
+  });
+
+  similarListElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      if (evt.target.classList.contains('picture')) {
+        var photo = evt.target.firstElementChild;
+        var photoAttribute = photo.getAttribute('src');
+        showBigPhoto(photoAttribute);
+      }
+    }
+  });
 })();
