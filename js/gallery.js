@@ -1,18 +1,20 @@
 'use strict';
 (function () {
   // обозначаем константы и переменные
+  var ENTER_KEYCODE = 13;
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
   var similarListElement = document.querySelector('.pictures');
   var similarPhotoTemplate = document.querySelector('#picture')
       .content
       .querySelector('.picture');
-  var uploadFileElement = document.querySelector('.img-upload__start');
   var imgFilters = document.querySelector('.img-filters');
   var popularPhotoFilter = imgFilters.querySelector('#filter-popular');
   var discussedPhotoFilter = imgFilters.querySelector('#filter-discussed');
   var newPhotoFilter = imgFilters.querySelector('#filter-new');
   var buttonsFilter = imgFilters.querySelectorAll('button');
   var picturesBlock = [];
-  var ENTER_KEYCODE = 13;
+  var fileChooser = document.querySelector('.img-upload__input');
+  var preview = document.querySelector('.img-upload__preview > img');
 
   // функция для создания блока с фото, передаем конкретное фото + количество лайков
   var renderPhoto = function (photo) {
@@ -26,9 +28,9 @@
   // передаем параметры нашего массива в функцию, вставляем фотографии ...
   var renderPhotos = function (array) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < array.length; i++) {
-      fragment.appendChild(renderPhoto(array[i]));
-    }
+    array.forEach(function (element) {
+      fragment.appendChild(renderPhoto(element));
+    });
     similarListElement.appendChild(fragment);
   };
 
@@ -41,12 +43,9 @@
 
   // функция для сортировки массива в случайном порядке
   var shuffleArray = function (array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-    }
+    array.sort(function () {
+      return Math.random() - 0.5;
+    });
     return array;
   };
 
@@ -71,6 +70,7 @@
   var showNewFotos = function (array) {
     var arrayCopy = array.slice();
     shuffleArray(arrayCopy);
+    arrayCopy.length = 10;
     renderPhotos(arrayCopy);
   };
 
@@ -96,20 +96,35 @@
   };
 
   var showBigPhoto = function (attribute) {
-    for (var i = 0; i < picturesBlock.length; i++) {
-      if (picturesBlock[i].url === attribute) {
-        window.showBigPicture(picturesBlock[i]);
-        break;
-      }
-    }
+    var newPicturesBlock = picturesBlock.filter(function (element) {
+      return element.url === attribute;
+    });
+    window.bigphoto.showBigPicture(newPicturesBlock[0]);
   };
 
   // открываем popup
-  uploadFileElement.addEventListener('change', function () {
-    window.openPopup();
+
+  fileChooser.addEventListener('change', function () {
+    var file = fileChooser.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+        preview.src = reader.result;
+        window.form.openPopup();
+      });
+
+      reader.readAsDataURL(file);
+    }
   });
 
-  window.load(showLoadSuccess, window.showErrorOfLoad);
+  window.backend.load(showLoadSuccess, window.serverStatus.showErrorOfLoad);
 
   var onFilterButtonClickDebounce = window.debounce(onFilterButtonClick);
 
@@ -126,7 +141,7 @@
     }
   });
 
-  similarListElement.addEventListener('keydown', function (evt) {
+  var onsimilarListElementClick = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       if (evt.target.classList.contains('picture')) {
         var photo = evt.target.firstElementChild;
@@ -134,5 +149,7 @@
         showBigPhoto(photoAttribute);
       }
     }
-  });
+  };
+
+  similarListElement.addEventListener('keydown', onsimilarListElementClick);
 })();

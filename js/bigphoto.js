@@ -1,5 +1,7 @@
 'use strict';
 (function () {
+  var COUNT_COMMENTS = 5;
+  var ESC_KEYCODE = 27;
   var bigPicture = document.querySelector('.big-picture');
   var bigPictureLikes = bigPicture.querySelector('.likes-count');
   var bigPictureDescription = bigPicture.querySelector('.social__caption');
@@ -9,10 +11,8 @@
   var bigPictureImg = bigPicture.querySelector('img');
   var bigPictureClose = bigPicture.querySelector('.big-picture__cancel');
   var commentLink = bigPicture.querySelector('.social__comments-loader');
-  var COUNT_COMMENTS = 5;
-  var ESC_KEYCODE = 27;
 
-  window.showBigPicture = function (imgBig) {
+  var showBigPicture = function (imgBig) {
     bigPicture.classList.remove('hidden');
     bigPictureImg.src = imgBig.url;
     bigPictureLikes.textContent = imgBig.likes;
@@ -45,7 +45,7 @@
       var commentImg = createElement('img', 'social__picture');
       comment.textContent = element.message;
       commentImg.src = element.avatar;
-      commentImg.alt = 'Аватар комментатора фотографии';
+      commentImg.alt = element.name;
       commentImg.width = 35;
       bigPictureCommentsList.appendChild(commentItem);
       commentItem.appendChild(commentImg);
@@ -98,4 +98,8 @@
 
   // закрываем большое изображение
   bigPictureClose.addEventListener('click', closeBigPhoto);
+
+  window.bigphoto = {
+    showBigPicture: showBigPicture
+  };
 })();
