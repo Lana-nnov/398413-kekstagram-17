@@ -1,6 +1,8 @@
 'use strict';
 (function () {
   // поиск полей для масштабирования фото, для наложения фильтров
+  var MIN_SCALE = 0;
+  var MAX_SCALE = 100;
   var popup = document.querySelector('.img-upload__overlay');
   var fieldsetElement = popup.querySelector('.img-upload__effects');
   var imgPreviewContainer = popup.querySelector('.img-upload__preview');
@@ -55,8 +57,8 @@
 
       var nextCoordinate = levelEffectDepth.offsetWidth - shift;
       var effectPercentage = nextCoordinate * 100 / levelLine.offsetWidth;
-      effectPercentage = Math.min(effectPercentage, 100);
-      effectPercentage = Math.max(effectPercentage, 0);
+      effectPercentage = Math.min(effectPercentage, MAX_SCALE);
+      effectPercentage = Math.max(effectPercentage, MIN_SCALE);
       applyFilter(effectPercentage);
     };
 
@@ -70,5 +72,7 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  window.applyFilter = applyFilter;
+  window.filter = {
+    applyFilter: applyFilter
+  };
 })();
