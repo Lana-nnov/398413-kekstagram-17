@@ -1,32 +1,31 @@
 'use strict';
 (function () {
+  var ESC_KEYCODE = 27;
   var mainPage = document.querySelector('main');
   var popup = document.querySelector('.img-upload__overlay');
-  var ESC_KEYCODE = 27;
 
   // в случае с успешной отправкой формы показываем сообщение, что все отправлено
   var successTemplate = document.querySelector('#success')
       .content
       .querySelector('.success');
 
-  // показываем окно об успешной отправке данных
-  window.responseData = function () {
-    popup.classList.add('hidden');
-    var successElement = successTemplate.cloneNode(true);
-    mainPage.appendChild(successElement);
-    successElement.addEventListener('click', function () {
-      onSectionClick('success');
-    });
-    document.addEventListener('keydown', onSectionEscPress('success'));
-  };
-
   // находим блок с сообщением об ошибке
   var errorTemplate = document.querySelector('#error')
       .content
       .querySelector('.error');
 
-  // в случае неуспешного ответа сервера показываем окно об ошибке
-  window.showErrorOfLoad = function (message) {
+  var responseData = function () {
+    popup.classList.add('hidden');
+    var successElement = successTemplate.cloneNode(true);
+    mainPage.appendChild(successElement);
+    window.form.resetForm();
+    successElement.addEventListener('click', function () {
+      onSectionClick('success');
+    });
+    document.addEventListener('keydown', onSectionEscPress);
+  };
+
+  var showErrorOfLoad = function (message) {
     var errorElement = errorTemplate.cloneNode(true);
     errorElement.querySelector('.error__buttons > button:last-child').classList.add('hidden');
     errorElement.querySelector('.error__title').textContent = message;
@@ -34,13 +33,13 @@
     errorElement.addEventListener('click', function () {
       onSectionClick('error');
     });
-    document.addEventListener('keydown', onSectionEscPress('error'));
+    document.addEventListener('keydown', onSectionEscPress);
   };
 
-  // в случае неуспешной загрузки формы показываем окно об ощибке, добавляется еще одна кнопка
-  window.showErrorOfLoadForm = function (message) {
+  var showErrorOfLoadForm = function (message) {
     popup.classList.add('hidden');
-    window.showErrorOfLoad(message);
+    showErrorOfLoad(message);
+    window.form.resetForm();
     var errorSection = document.querySelector('.error');
     errorSection.querySelector('.error__buttons > button:last-child').classList.remove('hidden');
   };
@@ -58,11 +57,22 @@
   };
 
   // функция для закрытия любого окна по нажатию клавиши ESC
-  var onSectionEscPress = function (section) {
-    return function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        closeSection(section);
-      }
-    };
+  var onSectionEscPress = function (evt) {
+    var section = document.querySelectorAll('section');
+    if (evt.keyCode === ESC_KEYCODE) {
+      section.forEach(function (element) {
+        if (element.classList.contains('success')) {
+          closeSection('success');
+        } else if (element.classList.contains('error')) {
+          closeSection('error');
+        }
+      });
+    }
+  };
+
+  window.serverStatus = {
+    responseData: responseData,
+    showErrorOfLoad: showErrorOfLoad,
+    showErrorOfLoadForm: showErrorOfLoadForm
   };
 })();
