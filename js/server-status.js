@@ -1,6 +1,5 @@
 'use strict';
 (function () {
-  var ESC_KEYCODE = 27;
   var mainPage = document.querySelector('main');
   var popup = document.querySelector('.img-upload__overlay');
 
@@ -18,11 +17,10 @@
     popup.classList.add('hidden');
     var successElement = successTemplate.cloneNode(true);
     mainPage.appendChild(successElement);
-    window.form.resetForm();
+    window.form.reset();
     successElement.addEventListener('click', function () {
       onSectionClick('success');
     });
-    document.addEventListener('keydown', onSectionEscPress);
   };
 
   var showErrorOfLoad = function (message) {
@@ -30,16 +28,16 @@
     errorElement.querySelector('.error__buttons > button:last-child').classList.add('hidden');
     errorElement.querySelector('.error__title').textContent = message;
     mainPage.appendChild(errorElement);
+    document.addEventListener('keydown', window.util.onSectionEscPress);
     errorElement.addEventListener('click', function () {
       onSectionClick('error');
     });
-    document.addEventListener('keydown', onSectionEscPress);
   };
 
   var showErrorOfLoadForm = function (message) {
     popup.classList.add('hidden');
     showErrorOfLoad(message);
-    window.form.resetForm();
+    window.form.reset();
     var errorSection = document.querySelector('.error');
     errorSection.querySelector('.error__buttons > button:last-child').classList.remove('hidden');
   };
@@ -48,31 +46,18 @@
   var closeSection = function (section) {
     var sectionElement = document.querySelector('.' + section);
     mainPage.removeChild(sectionElement);
-    document.removeEventListener('keydown', onSectionEscPress);
     document.removeEventListener('click', onSectionClick);
+    document.removeEventListener('keydown', window.util.onSectionEscPress);
   };
 
   var onSectionClick = function (section) {
     closeSection(section);
   };
 
-  // функция для закрытия любого окна по нажатию клавиши ESC
-  var onSectionEscPress = function (evt) {
-    var section = document.querySelectorAll('section');
-    if (evt.keyCode === ESC_KEYCODE) {
-      section.forEach(function (element) {
-        if (element.classList.contains('success')) {
-          closeSection('success');
-        } else if (element.classList.contains('error')) {
-          closeSection('error');
-        }
-      });
-    }
-  };
-
   window.serverStatus = {
     responseData: responseData,
     showErrorOfLoad: showErrorOfLoad,
-    showErrorOfLoadForm: showErrorOfLoadForm
+    showErrorOfLoadForm: showErrorOfLoadForm,
+    close: closeSection
   };
 })();

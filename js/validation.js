@@ -5,7 +5,8 @@
   var MAX_LENGTH_HASHTAG = 20;
   var popup = document.querySelector('.img-upload__overlay');
   var hashtag = popup.querySelector('.text__hashtags');
-  var formSection = document.querySelector('.img-upload__form');
+  var form = document.querySelector('.img-upload__form');
+  var buttonSubmit = form.querySelector('.img-upload__submit');
 
   var checkHashtags = function () {
     var hashtagValue = hashtag.value.replace(/\s+/g, ' ').trim().toLowerCase();
@@ -46,10 +47,11 @@
 
   hashtag.addEventListener('change', checkHashtags);
 
-  formSection.addEventListener('submit', function (evt) {
+  form.addEventListener('submit', function (evt) {
     evt.preventDefault();
     if (!hashtag.validationMessage) {
-      window.backend.upload(new FormData(formSection), window.serverStatus.responseData, window.serverStatus.showErrorOfLoadForm);
+      window.backend.upload(new FormData(form), window.serverStatus.responseData, window.serverStatus.showErrorOfLoadForm);
+      buttonSubmit.disabled = true;
     }
   });
 })();

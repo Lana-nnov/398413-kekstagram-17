@@ -73,6 +73,6 @@
   });
 
   window.filter = {
-    applyFilter: applyFilter
+    apply: applyFilter
   };
 })();
