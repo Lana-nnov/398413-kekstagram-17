@@ -11,7 +11,7 @@
   var popularPhotoFilter = imgFilters.querySelector('#filter-popular');
   var discussedPhotoFilter = imgFilters.querySelector('#filter-discussed');
   var newPhotoFilter = imgFilters.querySelector('#filter-new');
-  var buttonsFilter = imgFilters.querySelectorAll('button');
+  var photosFilters = imgFilters.querySelectorAll('button');
   var picturesBlock = [];
   var fileChooser = document.querySelector('.img-upload__input');
   var preview = document.querySelector('.img-upload__preview > img');
@@ -51,7 +51,7 @@
 
   // функция для смены класса на активном элементе и удаления предыдущей выборки фото
   var activateFilter = function (buttonActive) {
-    buttonsFilter.forEach(function (elem) {
+    photosFilters.forEach(function (elem) {
       elem.classList.remove('img-filters__button--active');
     });
     buttonActive.classList.add('img-filters__button--active');
@@ -99,7 +99,7 @@
     var newPicturesBlock = picturesBlock.filter(function (element) {
       return element.url === attribute;
     });
-    window.bigphoto.showBigPicture(newPicturesBlock[0]);
+    window.bigphoto.show(newPicturesBlock[0]);
   };
 
   // открываем popup
@@ -126,7 +126,7 @@
 
   window.backend.load(showLoadSuccess, window.serverStatus.showErrorOfLoad);
 
-  var onFilterButtonClickDebounce = window.debounce(onFilterButtonClick);
+  var onFilterButtonClickDebounce = window.util.debounce(onFilterButtonClick);
 
   // меняем подборку фотографий при нажатии на фильтр "Популярные"
   discussedPhotoFilter.addEventListener('click', onFilterButtonClickDebounce);
@@ -142,12 +142,10 @@
   });
 
   var onsimilarListElementClick = function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      if (evt.target.classList.contains('picture')) {
-        var photo = evt.target.firstElementChild;
-        var photoAttribute = photo.getAttribute('src');
-        showBigPhoto(photoAttribute);
-      }
+    if (evt.keyCode === ENTER_KEYCODE && evt.target.classList.contains('picture')) {
+      var photo = evt.target.firstElementChild;
+      var photoAttribute = photo.getAttribute('src');
+      showBigPhoto(photoAttribute);
     }
   };
 

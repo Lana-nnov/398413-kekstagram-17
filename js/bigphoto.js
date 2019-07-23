@@ -1,7 +1,7 @@
 'use strict';
 (function () {
   var COUNT_COMMENTS = 5;
-  var ESC_KEYCODE = 27;
+  var AVATAR_WIDTH = 35;
   var bigPicture = document.querySelector('.big-picture');
   var bigPictureLikes = bigPicture.querySelector('.likes-count');
   var bigPictureDescription = bigPicture.querySelector('.social__caption');
@@ -12,11 +12,11 @@
   var bigPictureClose = bigPicture.querySelector('.big-picture__cancel');
   var commentLink = bigPicture.querySelector('.social__comments-loader');
 
-  var showBigPicture = function (imgBig) {
+  var showBigPhoto = function (imgBig) {
     bigPicture.classList.remove('hidden');
     bigPictureImg.src = imgBig.url;
     bigPictureLikes.textContent = imgBig.likes;
-    if (imgBig.comments.length > 5) {
+    if (imgBig.comments.length > COUNT_COMMENTS) {
       bigPictureCommentsCount.textContent = imgBig.comments.length;
       bigPictureCommentCount.innerHTML = '5 из ' + bigPictureCommentsCount.textContent + ' комментариев';
     } else {
@@ -24,7 +24,7 @@
     }
     bigPictureDescription.innerHTML = imgBig.description;
     showComments(imgBig.comments);
-    document.addEventListener('keydown', onBigPhotoEscPress);
+    document.addEventListener('keydown', window.util.onSectionEscPress);
   };
 
   var createElement = function (element, elementClass) {
@@ -46,7 +46,7 @@
       comment.textContent = element.message;
       commentImg.src = element.avatar;
       commentImg.alt = element.name;
-      commentImg.width = 35;
+      commentImg.width = AVATAR_WIDTH;
       bigPictureCommentsList.appendChild(commentItem);
       commentItem.appendChild(commentImg);
       commentItem.appendChild(comment);
@@ -63,9 +63,9 @@
   var showMoreComments = function (evt) {
     evt.preventDefault();
     var parentBlock = evt.target.parentNode;
-    var commentItem = parentBlock.querySelectorAll('.social__comment');
-    var newArray = Array.prototype.slice.call(commentItem);
-    commentItem.forEach(function (element) {
+    var commentItems = parentBlock.querySelectorAll('.social__comment');
+    var newArray = Array.prototype.slice.call(commentItems);
+    commentItems.forEach(function (element) {
       if (element.style.display === 'flex') {
         newArray.shift(element);
       }
@@ -84,13 +84,7 @@
 
   var closeBigPhoto = function () {
     bigPicture.classList.add('hidden');
-    document.removeEventListener('kewdown', onBigPhotoEscPress);
-  };
-
-  var onBigPhotoEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeBigPhoto();
-    }
+    document.removeEventListener('keydown', window.util.onSectionEscPress);
   };
 
   // показываем еще комментарии под фото
@@ -100,6 +94,7 @@
   bigPictureClose.addEventListener('click', closeBigPhoto);
 
   window.bigphoto = {
-    showBigPicture: showBigPicture
+    show: showBigPhoto,
+    close: closeBigPhoto
   };
 })();
