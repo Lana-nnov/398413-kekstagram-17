@@ -11,20 +11,40 @@
   var imgPreviewContainer = popup.querySelector('.img-upload__preview');
   var imgPreview = imgPreviewContainer.querySelector('img');
   var buttonSubmit = form.querySelector('.img-upload__submit');
+  var userCommentTextarea = popup.querySelector('.text__description');
+
+  var addEscPress = function () {
+    document.addEventListener('keydown', onEscPress);
+  };
+
+  var removeEscPress = function () {
+    document.removeEventListener('keydown', onEscPress);
+  };
+
+  var onEscPress = function (evt) {
+    window.util.onSectionEscPress(evt, onFormEscPress);
+  };
+
+  var onFormEscPress = function () {
+    var isFocused = (document.activeElement === userCommentTextarea || document.activeElement === hashtag);
+    if (!isFocused) {
+      closePopup();
+    }
+  };
 
   var openPopup = function () {
     popup.classList.remove('hidden');
-    imgSize.value = '100%';
-    document.addEventListener('keydown', window.util.onSectionEscPress);
+    imgSize.value = MAX_SCALE + '%';
+    addEscPress();
     levelFieldset.classList.add('hidden');
   };
 
   // сброс значений для формы
   var resetForm = function () {
     form.reset();
-    imgPreview.style.filter = 'none';
-    imgPreviewContainer.style.transform = 'scale(1)';
-    hashtag.style.border = 'none';
+    imgPreview.style = '';
+    imgPreviewContainer.style = '';
+    hashtag.style = '';
     hashtag.setCustomValidity('');
     buttonSubmit.disabled = false;
   };
@@ -36,7 +56,7 @@
   var closePopup = function () {
     popup.classList.add('hidden');
     resetForm();
-    document.removeEventListener('kewdown', window.util.onSectionEscPress);
+    removeEscPress();
   };
 
   // закрываем popup
@@ -49,7 +69,6 @@
 
   window.form = {
     openPopup: openPopup,
-    closePopup: closePopup,
     reset: resetForm
   };
 })();

@@ -12,6 +12,18 @@
   var bigPictureClose = bigPicture.querySelector('.big-picture__cancel');
   var commentLink = bigPicture.querySelector('.social__comments-loader');
 
+  var addEscPress = function () {
+    document.addEventListener('keydown', onEscPress);
+  };
+
+  var removeEscPress = function () {
+    document.removeEventListener('keydown', onEscPress);
+  };
+
+  var onEscPress = function (evt) {
+    window.util.onSectionEscPress(evt, closeBigPhoto);
+  };
+
   var showBigPhoto = function (imgBig) {
     bigPicture.classList.remove('hidden');
     bigPictureImg.src = imgBig.url;
@@ -24,7 +36,7 @@
     }
     bigPictureDescription.innerHTML = imgBig.description;
     showComments(imgBig.comments);
-    document.addEventListener('keydown', window.util.onSectionEscPress);
+    addEscPress();
   };
 
   var createElement = function (element, elementClass) {
@@ -84,7 +96,7 @@
 
   var closeBigPhoto = function () {
     bigPicture.classList.add('hidden');
-    document.removeEventListener('keydown', window.util.onSectionEscPress);
+    removeEscPress();
   };
 
   // показываем еще комментарии под фото
@@ -94,7 +106,6 @@
   bigPictureClose.addEventListener('click', closeBigPhoto);
 
   window.bigphoto = {
-    show: showBigPhoto,
-    close: closeBigPhoto
+    show: showBigPhoto
   };
 })();
